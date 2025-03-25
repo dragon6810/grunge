@@ -1,13 +1,16 @@
 mergeInto(LibraryManager.library, 
 {
-  js_present_frame: function(ptr, width, height) 
+  js_presentframe: function(ptr, width, height) 
   {
-    console.log("js_present_frame called");
     if (!window.ctx) 
     {
       const canvas = document.getElementById("canvas");
       window.ctx = canvas.getContext("2d");
       window.imageData = ctx.createImageData(width, height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.webkitImageSmoothingEnabled = false;
+      ctx.mozImageSmoothingEnabled = false;
+      ctx.msImageSmoothingEnabled = false;
     }
 
     const imageData = window.imageData;
@@ -25,5 +28,19 @@ mergeInto(LibraryManager.library,
     }
 
     ctx.putImageData(imageData, 0, 0);
+  },
+
+  js_setupinput: function()
+  {
+    console.log('setup');
+    document.addEventListener('keydown', function (e) {
+      if (Module._i_keydown)
+          Module._i_keydown(e.keyCode);
+    });
+    
+    document.addEventListener('keyup', function (e) {
+      if (Module._i_keyup)
+          Module._i_keyup(e.keyCode);
+    });
   }
 });
