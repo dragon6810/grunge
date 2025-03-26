@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "i_input.h": "c",
+        "s_ents.h": "c"
     }
 }
