@@ -39,10 +39,52 @@ void vec3_rotate(vec3_t out, const vec3_t v, const rot_t r)
     out[1] = old[1] * cosine + old[0] * sine;
 }
 
+void vec3_subtract(vec3_t out, const vec3_t a, const vec3_t b)
+{
+    int i;
+
+    for(i=0; i<3; i++)
+        out[i] = a[i] - b[i];
+}
+
+void vec3_scale(vec3_t out, const vec3_t v, const float scale)
+{
+    int i;
+
+    for(i=0; i<3; i++)
+        out[i] = v[i] * scale;
+}
+
 void vec3_scaleadd(vec3_t out, const vec3_t a, const vec3_t b, const float scale)
 {
     int i;
 
     for(i=0; i<3; i++)
         out[i] = a[i] + b[i] * scale;
+}
+
+void vec3_normalize(vec3_t out, const vec3_t v)
+{
+    int i;
+
+    float len;
+
+    for(i=0, len=0; i<3; i++)
+        len += v[i];
+    len = sqrtf(len);
+
+    for(i=0; i<3; i++)
+        out[i] = v[i] / len;
+}
+
+float vec3_dot(const vec3_t a, const vec3_t b)
+{
+    int i;
+
+    float dot;
+
+    for(i=0, dot=0; i<3; i++)
+        dot += a[i] * b[i];
+
+    return dot;
 }
