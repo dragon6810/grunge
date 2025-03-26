@@ -2,6 +2,8 @@
     "files.associations": {
         "stdio.h": "c",
         "i_input.h": "c",
-        "s_ents.h": "c"
+        "s_ents.h": "c",
+        "i_video.h": "c",
+        "m_math.h": "c"
     }
 }

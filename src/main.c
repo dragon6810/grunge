@@ -5,16 +5,11 @@
 #include <time.h>
 
 #include "client/i_input.h"
+#include "client/i_video.h"
 #include "client/c_player.h"
+#include "client/r_main.h"
 #include "server/s_tick.h"
 #include "server/s_ents.h"
-
-#define WIDTH 320
-#define HEIGHT 200
-
-uint32_t framebuffer[WIDTH * HEIGHT];
-
-extern void js_presentframe(uint8_t *data, int width, int height);
 
 bool runtick(void)
 {
@@ -43,18 +38,10 @@ bool runtick(void)
         //printf("Player pos: (%f, %f, %f)\n", player.pos[0], player.pos[1], player.pos[2]);
 
         s_tick();
-
-        for (int y = 0; y < HEIGHT; y++)
-        {
-            for (int x = 0; x < WIDTH; x++)
-            {
-                int i = y * WIDTH + x;
-                framebuffer[i] = 0xFF000000 | (x << 16) | (y << 8);  // RGB
-            }
-        }
     }
 
-    js_presentframe((uint8_t*)framebuffer, WIDTH, HEIGHT);
+    r_renderplayerview();
+    i_present();
     lasttime = now;
 
     return true;

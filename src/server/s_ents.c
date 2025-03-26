@@ -49,5 +49,5 @@ void s_processplayerinputs(s_player_t* player)
     if(player->right)
         vec3_scaleadd(player->pos, player->pos, right, movespeed);
 
-    printf("Player: (%f, %f, %f)\n", player->pos[0], player->pos[1], player->pos[2]);
+    // printf("Player: (%f, %f, %f)\n", player->pos[0], player->pos[1], player->pos[2]);
 }
