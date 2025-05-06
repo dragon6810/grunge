@@ -87,7 +87,7 @@ void r_renderline(int x1, int y1, int x2, int y2, uint32_t color)
 }
 
 const float nearplane = 1;
-const float farplane = 4096;
+const float farplane = 8192;
 
 vec3_t frustumplanesn[6];
 float frustumplanesd[6];
@@ -107,7 +107,7 @@ void r_findfrustumplanes(void)
     frustumplanesn[0][0] = -1;
     frustumplanesd[0] = -nearplane;
     vec3_copy(frustumplanesn[1], vec3_origin);
-    frustumplanesn[1][0] = 1;
+    frustumplanesn[1][0] = 0;
     frustumplanesd[1] = farplane;
 
     farsize[0] = tanf(DEG2RAD(FOV) * 0.5) * farplane;
@@ -150,16 +150,7 @@ void r_findfrustumplanes(void)
         vec3_subtract(b, planepoints[2], planepoints[0]);
         vec3_cross(frustumplanesn[i+2], a, b);
         vec3_normalize(frustumplanesn[i+2], frustumplanesn[i+2]);
-        printf("( %f %f %f ) x ( %f %f %f ) = ( %f %f %f )\n",
-            a[0], a[1], a[2],
-            b[0], b[1], b[2],
-            frustumplanesn[i+2][0], frustumplanesn[i+2][1], frustumplanesn[i+2][2]);
         frustumplanesd[i+2] = 0;
-
-        //printf("distances: %f %f %f\n", 
-        //    vec3_dot(planepoints[0], frustumplanesn[i+2]),
-        //    vec3_dot(planepoints[1], frustumplanesn[i+2]),
-        //    vec3_dot(planepoints[2], frustumplanesn[i+2]));
     }
 }
 
@@ -209,7 +200,6 @@ int r_cliplinetofrustum(const vec3_t v1, const vec3_t v2, vec3_t out1, vec3_t ou
 
 void r_renderworldline(const vec3_t v1, const vec3_t v2)
 {
-    rot_t revrot;
     float v1x, v1y, v2x, v2y;
     float hplane, vplane;
     float t;
@@ -218,44 +208,38 @@ void r_renderworldline(const vec3_t v1, const vec3_t v2)
     vec3_t v1local, v2local;
     float d1, d2;
 
-    vec3_scale(revrot, player.rot, -1);
     vec3_subtract(v1local, v1, player.pos);
     vec3_subtract(v2local, v2, player.pos);
     vec3_invrotate(v1local, v1local, player.rot);
     vec3_invrotate(v2local, v2local, player.rot);
 
+    printf("edge from ( %f %f %f ) to ( %f %f %f )\n", v1[0], v1[1], v1[2], v2[0], v2[1], v2[2]);
+    printf("edge from ( %f %f %f ) to ( %f %f %f )\n", v1local[0], v1local[1], v1local[2], v2local[0], v2local[1], v2local[2]);
+
     if(!r_cliplinetofrustum(v1local, v2local, v1local, v2local))
         return;
 
-    hplane = 2.0 * tanf(DEG2RAD(FOV)*0.5);
+    printf("edge from ( %f %f %f ) to ( %f %f %f )\n", v1local[0], v1local[1], v1local[2], v2local[0], v2local[1], v2local[2]);
+
+    hplane = 2.0 * tanf(DEG2RAD(FOV) * 0.5);
     vplane = hplane * ((float) SCREENHEIGHT / (float) SCREENWIDTH);
 
-    v1x = -(v1local[1]) / hplane / v1local[0];
-    v1y = -(v1local[2]) / vplane / v1local[0];
-    v2x = -(v2local[1]) / hplane / v2local[0];
-    v2y = -(v2local[2]) / vplane / v2local[0];
+    v1x = -v1local[1] / (hplane * v1local[0]);
+    v1y = -v1local[2] / (vplane * v1local[0]);
+    v2x = -v2local[1] / (hplane * v2local[0]);
+    v2y = -v2local[2] / (vplane * v2local[0]);
+
+    printf("edge from ( %f %f ) to ( %f %f )\n", v1x, v1y, v2x, v2y);
 
     v1x = (v1x + 0.5) * SCREENWIDTH;
     v1y = (v1y + 0.5) * SCREENHEIGHT;
     v2x = (v2x + 0.5) * SCREENWIDTH;
     v2y = (v2y + 0.5) * SCREENHEIGHT;
 
-    if(v1x < 0)
-        v1x = 0;
-    if(v1x > SCREENWIDTH-1)
-        v1x = SCREENWIDTH-1;
-    if(v2x < 0)
-        v2x = 0;
-    if(v2x > SCREENWIDTH-1)
-        v2x = SCREENWIDTH-1;
-    if(v1y < 0)
-        v1y = 0;
-    if(v1y > SCREENHEIGHT-1)
-        v1y = SCREENHEIGHT-1;
-    if(v2y < 0)
-        v2y = 0;
-    if(v2y > SCREENHEIGHT-1)
-        v2y = SCREENHEIGHT-1;
+    CLAMP(v1x, 0, SCREENWIDTH-1);
+    CLAMP(v1y, 0, SCREENHEIGHT-1);
+    CLAMP(v2x, 0, SCREENWIDTH-1);
+    CLAMP(v2y, 0, SCREENHEIGHT-1);
 
     r_renderline(v1x, v1y, v2x, v2y, 0xFFFFFFFF);
 }
@@ -267,15 +251,16 @@ void r_rendertestplane(void)
     vec3_t verts[4];
 
     for(i=0; i<4; i++)
+    {
         vec3_copy(verts[i], vec3_origin);
-    for(i=0; i<4; i++)
         verts[i][2] = -128;
+    }
     
     verts[0][0] = 1024;
     verts[0][1] = -1024;
 
     verts[1][0] = 1024;
-    verts[2][1] = 1024;
+    verts[1][1] = 1024;
 
     verts[2][0] = -1024;
     verts[2][1] = 1024;

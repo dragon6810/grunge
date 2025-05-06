@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define SCREENWIDTH 320
-#define SCREENHEIGHT 200
+#define SCREENHEIGHT 240
 
 extern uint32_t framebuffer[SCREENWIDTH * SCREENHEIGHT];
 

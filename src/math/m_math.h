@@ -12,5 +12,10 @@
                     b ^= a;       \
                     a ^= b;       \
                    } while(0)
+#define CLAMP(x, min, max) do                    \
+                           {                     \
+                            if(x < min) x = min; \
+                            if(x > max) x = max; \
+                           } while(0);              
 
 #endif
