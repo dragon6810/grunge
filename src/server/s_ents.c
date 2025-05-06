@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#include <math/m_math.h>
 #include "s_tick.h"
 
 s_player_t* players[MAXPLAYERS];
@@ -13,6 +14,7 @@ void s_processplayerinputs(s_player_t* player)
     vec3_t forward, right, up;
     const float turnsense = M_PI / TICKRATE;
     const float movespeed = 512 / TICKRATE;
+    const float maxpitch = DEG2RAD(89);
 
     if(player->lup)
         player->addpitch += turnsense;
@@ -25,6 +27,11 @@ void s_processplayerinputs(s_player_t* player)
 
     player->rot[1] += player->addpitch;
     player->rot[2] += player->addyaw;
+
+    if(player->rot[1] > maxpitch)
+        player->rot[1] = maxpitch;
+    if(player->rot[1] < -maxpitch)
+        player->rot[1] = -maxpitch;
 
     player->addpitch = player->addyaw = 0;
 

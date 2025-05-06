@@ -39,6 +39,35 @@ void vec3_rotate(vec3_t out, const vec3_t v, const rot_t r)
     out[1] = old[1] * cosine + old[0] * sine;
 }
 
+void vec3_invrotate(vec3_t out, const vec3_t v, const rot_t r)
+{
+    vec3_t old;
+    float theta, cosine, sine;
+
+    vec3_copy(out, v);
+
+    theta = -r[2];
+    vec3_copy(old, out);
+    sine = sinf(theta);
+    cosine = cosf(theta);
+    out[0] = old[0] * cosine - old[1] * sine;
+    out[1] = old[1] * cosine + old[0] * sine;
+
+    theta = -r[1];
+    vec3_copy(old, out);
+    sine = sinf(theta);
+    cosine = cosf(theta);
+    out[0] = old[0] * cosine - old[2] * sine;
+    out[2] = old[2] * cosine + old[0] * sine;
+
+    theta = -r[0];
+    vec3_copy(old, out);
+    sine = sinf(-theta);
+    cosine = cosf(-theta);
+    out[1] = old[1] * cosine - old[2] * sine;
+    out[2] = old[2] * cosine + old[1] * sine;
+}
+
 void vec3_subtract(vec3_t out, const vec3_t a, const vec3_t b)
 {
     int i;
@@ -70,7 +99,7 @@ void vec3_normalize(vec3_t out, const vec3_t v)
     float len;
 
     for(i=0, len=0; i<3; i++)
-        len += v[i];
+        len += v[i] * v[i];
     len = sqrtf(len);
 
     for(i=0; i<3; i++)
@@ -87,4 +116,15 @@ float vec3_dot(const vec3_t a, const vec3_t b)
         dot += a[i] * b[i];
 
     return dot;
+}
+
+void vec3_cross(vec3_t out, const vec3_t a, const vec3_t b)
+{
+    vec3_t v;
+
+    v[0] = a[1] * b[2] - a[2] * b[1];
+    v[1] = a[2] * b[0] - a[0] * b[2];
+    v[2] = a[0] * b[1] - a[1] * b[0];
+
+    vec3_copy(out, v);
 }
